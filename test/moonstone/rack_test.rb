@@ -22,11 +22,11 @@ describe "Moonstone::Racker" do
   end
   
   it "has a built in search example" do
-    @app.should_receive(:search).with("I need stuff").and_return(["Here, have mine.", "Moocher."])
+    @app.should_receive(:search).with("I need stuff", {}).and_return(["Here, have mine.", "Moocher."])
     response = @req.get("/search.html?input=I%20need%20stuff")
     response.body.should == "Here, have mine.\n<br>Moocher."
     
-    @app.should_receive(:search).with("Food").and_return(["You can't have any"])
+    @app.should_receive(:search).with("Food", {}).and_return(["You can't have any"])
     response = @req.get("/search.json?input=Food")
     response.body.should ==  %q{["You can't have any"]}
     
@@ -34,9 +34,9 @@ describe "Moonstone::Racker" do
     response = @req.get("/search.json?input=Drink&limit=3")
     response.body.should ==  %q{["You can't have any"]}
     
-    @app.should_receive(:search).with("one", nil).and_return(%w{a b})
-    @app.should_receive(:search).with("two", nil).and_return(%w{c d})
-    @app.should_receive(:search).with("three", nil).and_return([])
+    @app.should_receive(:search).with("one", {}).and_return(%w{a b})
+    @app.should_receive(:search).with("two", {}).and_return(%w{c d})
+    @app.should_receive(:search).with("three", {}).and_return([])
     data = JSON.unparse(%w{ one two three })
     response = @req.post("/search.json", :input => data)
     response.body.should == %q([["a","b"],["c","d"],[]])
