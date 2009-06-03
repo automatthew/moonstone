@@ -79,6 +79,14 @@ describe "A subclass of Moonstone::Engine" do
     results.size.should == 1
   end
   
+  it "can search with an offset" do
+    all = @engine.search("Pizza Hut")
+    all.size.should == 2
+    results = @engine.search("Pizza Hut", :limit => 1, :offset => 1)
+    results.size.should == 1
+    results[0].id.should == all[1].id
+  end
+  
   it "search returns an Enumerable results set" do
     @results.class.included_modules.should include Enumerable
     @results.should.respond_to? :each

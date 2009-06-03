@@ -84,9 +84,11 @@ module Moonstone
         @searcher.search(query, *args)
         hit_collector.topDocs
       else
-        args = [ options[:filter], (options[:limit] || 25) ]  #Always include both of these, even if nil
+        options[:limit] ||= 25
+        options[:offset] ||= 0
+        args = [ options[:filter], (options[:limit] + options[:offset]) ]  #Always include both of these, even if nil
         args << options[:sort] if options[:sort]
-        @searcher.search(query, *args)
+        @searcher.search(query, *args).offset!(options[:offset])
       end
       top_docs.each(@searcher) do |doc| 
         doc.tokens = self.tokens_for_doc(doc) if inspect_mode?

@@ -30,12 +30,22 @@ module Lucene
       end
       
       def initialize_docs(searcher)
-        self.scoreDocs.each do |sd|
-          doc = searcher.doc(sd.doc)
-          doc.score = sd.score
-          doc.id = sd.doc
-          documents << doc
+        @offset ||= 0
+        self.scoreDocs.each_with_index do |sd, i|
+          #For pagination, only init the docs that fit the offset
+          if i >= @offset
+            doc = searcher.doc(sd.doc)
+            doc.score = sd.score
+            doc.id = sd.doc
+            documents << doc
+          end
         end
+      end
+      
+      #Remove docs that precede the offset
+      def offset!(offset)
+        @offset = offset || 0
+        self
       end
       
       def [](index)
@@ -47,7 +57,7 @@ module Lucene
       end
       
       def length
-        self.scoreDocs.length
+        self.scoreDocs.length - (@offset || 0)
       end
       
       alias_method :size, :length
