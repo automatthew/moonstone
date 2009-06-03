@@ -48,6 +48,10 @@ module Lucene
         self
       end
       
+      def offset
+        @offset ||= 0
+      end
+      
       def [](index)
         documents[index]
       end
