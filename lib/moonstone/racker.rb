@@ -53,5 +53,19 @@ module Moonstone
       }.to_json
     end
     
+    def self.generate_rackup(engine, store, *load_paths)
+      here = File.expand_path(File.dirname(__FILE__))
+      load_paths = load_paths.map { |p| "$:.unshift '#{p}'" }.join("\n")
+      rackup = <<RACKUP
+#{load_paths}
+require 'lark'
+require 'moonstone/racker/local_search'
+#{engine}.module_eval do
+  include Moonstone::Racker::LocalSearch
+end
+run #{engine}.new(:store => "#{store}")
+RACKUP
+    end
+    
   end
 end
