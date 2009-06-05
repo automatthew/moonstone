@@ -24,5 +24,7 @@ require 'moonstone/index_inspection'
 require 'moonstone/mixins/result_methods.rb'
 require 'moonstone/filters/synonymer.rb'
 
+require 'moonstone/racker'
+
 Moonstone::Logger = Logger.new($stderr) unless defined? Moonstone::Logger
 Lucene::Document::Document.send(:include, Moonstone::Mixins::ResultMethods)
