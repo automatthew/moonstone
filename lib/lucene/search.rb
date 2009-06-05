@@ -60,6 +60,10 @@ module Lucene
         documents[0]
       end
       
+      def last
+        to_a.last
+      end
+      
       def length
         self.scoreDocs.length - (@offset || 0)
       end

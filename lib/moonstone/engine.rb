@@ -16,13 +16,6 @@ module Moonstone
       IndexWriter.open(@store, analyzer) do |writer|
         writer.set_similarity(@similarity.new) if @similarity
         
-        metadata = Lucene::Document::Doc.new
-        metadata.add_field 'build_date', Date.today.strftime("%Y-%m-%d"), :index => false
-        metadata.add_field 'engine_name', self.class.name, :index => false
-        metadata.add_field 'engine_version', `git show-ref -s --abbrev HEAD`.chomp, :index => false
-        metadata.add_field 'query_conditions', ENV['query_conditions'].to_s, :index => false
-        writer.add_document(metadata)
-        
         source.each_with_index do |record, i|
           doc = doc_from(record)
           writer.add_document(doc) if doc
@@ -34,9 +27,21 @@ module Moonstone
       refresh_searcher
     end
     
+    def stamp_metadata
+      metadata = Lucene::Document::Doc.new
+      metadata.add_field 'metadata', 'index', :index => :not_analyzed
+      metadata.add_field 'build_date', Date.today.strftime("%Y-%m-%d"), :index => false
+      metadata.add_field 'engine_name', self.class.name, :index => false
+      metadata.add_field 'engine_version', `git show-ref -s --abbrev HEAD`.chomp, :index => false
+      metadata.add_field 'query_conditions', ENV['query_conditions'].to_s, :index => false
+      writer do |w|
+        w.add_document(metadata)
+      end
+    end
+    
     def index_metadata
-      @reader ||= Lucene::Index::IndexReader.open(@store)
-      @index_metadata ||= @reader.document(0)
+      query = TermQuery.new 'metadata', 'index'
+      @index_metadata ||= search(query).last
     end
     
     # Adds docs to index.  docs must be an enumerable set of such objects that doc_from can turn into a document
