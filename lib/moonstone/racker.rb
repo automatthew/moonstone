@@ -39,25 +39,18 @@ module Moonstone
       limit ? {:limit => limit.to_i} : {}
     end
     
-    # Reasonably useful basic examples
-    
-    # GET /search.html?input=happiness
-    def html_GET_search(request)
-      results = search(request.params['input'], search_options(request))
-      results.join("\n<br>")
+    def json_GET_engine_version(request)
+      { :name => self.class.name, 
+        :version => `git show-ref -s --abbrev HEAD`.chomp
+      }.to_json
     end
     
-    # GET /search.json?input=happiness
-    def json_GET_search(request)
-      results = search(request.params['input'], search_options(request))
-      results.to_json
-    end
-    
-    # POST /search.json
-    def json_POST_search(request)
-      options = search_options(request)
-      data = request.env['rack.input'].read
-      JSON.parse(data).map { |input| search(input, options) }.to_json
+    def json_GET_index_version(request)
+      { :build_date => index_metadata["build_date"],
+          :engine_name => index_metadata["engine_name"],
+          :engine_version => index_metadata["engine_version"],
+          :query_conditions => index_metadata["query_conditions"]
+      }.to_json
     end
     
   end

@@ -1,10 +1,10 @@
 require File.join(File.dirname(__FILE__), "/../helpers.rb")
-require 'moonstone/racker'
+require 'moonstone/racker/basic_search'
 
 describe "Moonstone::Racker" do
   
   before do
-    @class = Class.new { include Moonstone::Racker }
+    @class = Class.new { include Moonstone::Racker::BasicSearch }
     @app = @class.new
     @req = Rack::MockRequest.new(@app)
   end

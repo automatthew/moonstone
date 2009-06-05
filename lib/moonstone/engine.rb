@@ -15,6 +15,14 @@ module Moonstone
     def index(source, optimize=true)
       IndexWriter.open(@store, analyzer) do |writer|
         writer.set_similarity(@similarity.new) if @similarity
+        
+        metadata = Lucene::Document::Doc.new
+        metadata.add_field 'build_date', Date.today.strftime("%Y-%m-%d"), :index => false
+        metadata.add_field 'engine_name', self.class.name, :index => false
+        metadata.add_field 'engine_version', `git show-ref -s --abbrev HEAD`.chomp, :index => false
+        metadata.add_field 'query_conditions', ENV['query_conditions'].to_s, :index => false
+        writer.add_document(metadata)
+        
         source.each_with_index do |record, i|
           doc = doc_from(record)
           writer.add_document(doc) if doc
@@ -24,6 +32,11 @@ module Moonstone
         yield writer if block_given? #For post-processing stuff where you still need access to the writer
       end
       refresh_searcher
+    end
+    
+    def index_metadata
+      @reader ||= Lucene::Index::IndexReader.open(@store)
+      @index_metadata ||= @reader.document(0)
     end
     
     # Adds docs to index.  docs must be an enumerable set of such objects that doc_from can turn into a document
