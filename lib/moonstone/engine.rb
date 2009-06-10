@@ -44,6 +44,21 @@ module Moonstone
       @index_metadata ||= search(query).last
     end
     
+    def doc_count
+      @reader ||= IndexReader.open(@store)
+      @reader.max_doc
+    end
+    
+    def document(id)
+      @reader ||= IndexReader.open(@store)
+      if id < @reader.max_doc
+        doc = @reader.document(id) 
+        doc.tokens = tokens_for_doc(id)
+        doc.id = id
+        doc
+      end
+    end
+    
     # Adds docs to index.  docs must be an enumerable set of such objects that doc_from can turn into a document
     def insert_documents(source, optimize=false)
       index(source, optimize)
