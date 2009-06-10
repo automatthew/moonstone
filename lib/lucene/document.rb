@@ -7,6 +7,7 @@ module Lucene
     
     # I spit on final class
     Doc.module_eval do
+      attr_accessor :query, :score, :id, :tokens, :explanation
       
       self::Field = Lucene::Document::Field
       
@@ -106,7 +107,18 @@ module Lucene
       
       def to_hash
         hash = {}
-        keys.each {|k| hash[k] = self[k]}
+        hash["id"] = @id if @id
+        hash["score"] = @score if @score
+        hash["query"] = @query if @query
+        hash["explanation"] = @explanation.toString(1) if @explanation
+        fields = {}
+        hash["fields"] = fields
+        keys.each do|k|
+          values = self.get_all(k)
+          # fields[k] = values.size == 1 ? values.first : values
+          fields[k] = values
+        end
+        hash["tokens"] = @tokens if @tokens
         hash
       end
       
