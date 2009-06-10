@@ -35,32 +35,44 @@ module Moonstone
     
     # helper for action methods
     def search_options(request)
-      limit = request.params['limit']
-      limit ? {:limit => limit.to_i} : {}
+      params = request.params
+      limit = params['limit']
+      offset = params['offset']
+      options = {}
+      options[:limit] = limit.to_i if limit
+      options[:offset] = offset.to_i if offset
+      options
     end
     
     def json_GET_engine_version(request)
       { :name => self.class.name, 
-        :version => `git show-ref -s --abbrev HEAD`.chomp
+        :version => `git show-ref -h -s --abbrev HEAD`.chomp.split.first
       }.to_json
     end
     
-    def json_GET_index_version(request)
-      { :build_date => index_metadata["build_date"],
-          :engine_name => index_metadata["engine_name"],
-          :engine_version => index_metadata["engine_version"],
-          :query_conditions => index_metadata["query_conditions"]
+    def json_GET_index_info(request)
+      md = index_metadata || {}
+      {   :build_date => md["build_date"],
+          :build_engine => {  :name => md["engine_name"], 
+                              :version => md["engine_version"]},
+          :query_conditions => md["query_conditions"],
+          :doc_count => doc_count
       }.to_json
+    end
+    
+    def json_GET_document(request)
+      document(request.params['id'].to_i).to_json
     end
     
     def self.generate_rackup_file(engine, store)      
       rackup = <<RACKUP
+options[:Port] = 9293
 #{yield}
 require 'moonstone/racker/local_search'
 #{engine}.module_eval do
   include Moonstone::Racker::LocalSearch
 end
-run #{engine}.new(:store => "#{store}")
+run #{engine}.new(:store => "#{File.expand_path store}")
 RACKUP
 
       File.open "#{File.dirname(store)}/config.ru", "w" do |f|

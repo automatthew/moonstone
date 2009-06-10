@@ -8,7 +8,10 @@ module Moonstone
         args = request.params.values_at('input', 'lat', 'lon')
         options = search_options(request)
         args << options
-        search(*args).to_json
+        t = Time.now
+        results = search(*args).to_hash
+        results[:time] = Time.now - t
+        results.to_json
       end
     
       # JSON body should contain an array of 3-element arrays (topic, lat, lon)
@@ -17,7 +20,12 @@ module Moonstone
       def json_POST_search(request)
         options = search_options(request)
         data = request.env['rack.input'].read
-        JSON.parse(data).map { |input, lat, lon| search(input, lat, lon, options) }.to_json
+        JSON.parse(data).map do |input, lat, lon|
+          t = Time.now
+          results = search(input, lat, lon, options).to_hash
+          results[:time] = Time.now - t
+          results
+        end.to_json
       end
     
     end
