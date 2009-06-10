@@ -7,7 +7,7 @@ module Lucene
     
     # I spit on final class
     Doc.module_eval do
-      attr_accessor :query, :score, :id, :tokens, :explanation
+      attr_accessor :score, :id, :tokens, :explanation
       
       self::Field = Lucene::Document::Field
       
@@ -109,7 +109,6 @@ module Lucene
         hash = {}
         hash["id"] = @id if @id
         hash["score"] = @score if @score
-        hash["query"] = @query if @query
         hash["explanation"] = @explanation.toString(1) if @explanation
         fields = {}
         hash["fields"] = fields

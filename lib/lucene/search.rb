@@ -22,6 +22,7 @@ module Lucene
     end
     
     TopDocs.module_eval do
+      attr_accessor :query
       include Enumerable
             
       def each(searcher=nil)
@@ -74,11 +75,16 @@ module Lucene
         self.length == 0
       end
       
-      def to_json
+      def to_hash
         {
+          :query => self.query,
           :total_hits => self.totalHits,
           :documents => self.to_a
-        }.to_json
+        }
+      end
+      
+      def to_json
+        to_hash.to_json
       end
       
     private
