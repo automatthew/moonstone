@@ -21,7 +21,6 @@ require 'moonstone/analyzer'
 require 'moonstone/multi_analyzer'
 require 'moonstone/index_inspection'
 
-require 'moonstone/mixins/result_methods.rb'
 require 'moonstone/filters/synonymer.rb'
 
 require 'moonstone/racker'
