@@ -1,0 +1,105 @@
+= Moonstone
+
+Moonstone is a JRuby wrapper around Java's Lucene search engine toolkit.
+
+== Goals
+
+* Engines: An engine abstraction that brings all common index and search operations under a single roof.
+* Lucene Transparency: a transparent JRuby wrapper around Lucene
+* Rubify Lucene: higher level classes that simplify use of Lucene constructs in Ruby
+
+== Engines
+
+Creating an engine requires two things; a doc_from method and an analyzer.
+
+	class SimplestEngine < Moonstone::Engine
+	  def doc_from(record)
+	    doc = Lucene::Document::Doc.new
+	    doc.add_field('name', record[:name])
+	    doc.add_field('desc', record[:description])
+	    doc
+	  end
+
+	  def analyzer
+	    @analyzer ||= Lucene::Analysis::WhitespaceAnalyzer.new
+	  end
+	end 
+
+	# We can now instantiate the engine
+	engine = SimplestEngine.new
+
+	# and create an index of some data
+	records = [
+	    {:name => "Moonstone", :description => "A simple JRuby wrapper around Lucene"},
+	    {:name => "Foo", :description => "A search engine based on Moonstone"}
+	  ]
+	# By convention the index method accepts an Enumerable that yields hashes 
+	engine.index(records)
+
+	#Search for data
+	q = Lucene::Search::TermQuery.new("name", "Moonstone")
+	documents = engine.search(q)
+	documents.each {|d| puts d['name']}
+
+== Lucene Transparency
+
+One of Moonstones core goals is to provide easy and transparet access to all of Lucene's classes and apis. This is accomplished through wrapper classes which, among other things, can be used to mimic typical Lucene usage in java.
+
+	store = Lucene::Store::RAMDirectory.new
+	analyzer = Lucene::Analysis::WhitespaceAnalyzer.new
+	writer = Lucene::Index::IndexWriter.new(store, analyzer)
+	document = Lucene::Document::Document.new
+	STORE = Lucene::Document::Field::Store::YES
+	ANALYZE = Lucene::Document::Field::Index::ANALYZED
+	field = Lucene::Document::Field.new("name", "Pizza Hut", STORE, ANALYZE)
+	document.add(field)
+	writer.add_document(document)
+	writer.close
+
+== Rubify Lucene
+
+Moonstone gently augments these wrapper classes with some common Ruby idioms and niceties, making enumerable things Enumerable, using the IO#open pattern with objects that need closing, and supporting the inclusion of namespaces.  Where possible, Moonstone adds helper methods that improve the signal-to-noise ratio.
+
+	include Lucene::Store
+	include Lucene::Index
+	include Lucene::Analysis
+	include Lucene::Document
+	include Lucene::Search
+
+	store = RAMDirectory.new
+	analyzer = WhitespaceAnalyzer.new
+	IndexWriter.open(store, analyzer) do |writer|
+	  doc1 = Doc.new
+	  #create a document and add fields manually
+	  doc1.add_field("name", "Pizza Hut")
+	  doc1.add_field("category", "pseudo-Italian food", :term_vector => :with_positions)
+	  doc1.add_field("zip", "78660", :index => false)
+	  #or create a doc and add fields by pattern in the constructor
+	  doc2 = Doc.create [ ["name", "Olive Garden"], 
+	                      ["category", "pseudo-Italian food", { :term_vector => :with_positions }],
+	                      ["zip", "78660", { :index => false }] ]
+	  writer.add_documents([doc1, doc2])
+	end
+
+	IndexSearcher.open(store) do |searcher|
+	  query = TermQuery.new("name", "Pizza")
+	  top_docs = searcher.search(query, 10)
+	  top_docs.each(searcher) { |doc| puts doc["name"] }
+	end
+
+Moonstone also supplies base classes that make it easy to create such things as TokenFilters in Ruby:
+
+	class StemFilter < Moonstone::Filter
+	  def process(text)
+	    # ... Code to stem tokens would go here ...
+	  end
+	end
+
+Moonstone also makes the common stuff easy. Many filters transform a single token into multiple tokens which requires the filter to maintain a queue of the tokens for subsequent calls to next(). In java this is usually achieved with copypasta. Moonstone provides a base class which handles this for you. Simply inherit from Moonstone::QueuedFilter and return an array of strings (or an individual string if no expansion is needed) and the tokenizing and queueing is handled by the base class.
+
+	class MakePluralFilter < Moonstone::QueuedFilter
+	  def process(text)
+	    # we can return an array of strings or an individual string
+	    [text, text + 's']
+	  end
+	end 
