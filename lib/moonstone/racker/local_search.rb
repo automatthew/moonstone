@@ -5,7 +5,7 @@ module Moonstone
       include Moonstone::Racker
     
       def json_GET_search(request)
-        args = request.params.values_at('input', 'lat', 'lon')
+        args = request.params.values_at('topic', 'lat', 'lon')
         options = search_options(request)
         args << options
         t = Time.now
@@ -20,7 +20,7 @@ module Moonstone
       def json_POST_search(request)
         options = search_options(request)
         data = request.env['rack.input'].read
-        JSON.parse(data).map do |input, lat, lon|
+        JSON.parse(data).map do |topic, lat, lon|
           t = Time.now
           results = search(input, lat, lon, options).to_hash
           results[:time] = Time.now - t
