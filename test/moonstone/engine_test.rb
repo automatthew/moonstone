@@ -22,28 +22,31 @@ describe "A subclass of Moonstone::Engine" do
     end
     
     @class = Class.new(Moonstone::Engine) do
-      def doc_from(record)
-        Doc.create(record)
-      end
-      
       def create_query(string)
         token = string.split(" ").first.downcase
         TermQuery.new(Term.new("description", token))
       end
-      
-      def analyzer
-        Lucene::Analysis::StandardAnalyzer.new
-      end
-      
     end
     
     @engine = @class.new(:store => @store, :inspect => true)
     @results = @engine.search("Pizza Hut")
     @result = @results.first
+
+    doc1 = [["name", "Burger King"], ["description", "Fast food"]]
+    doc2 = [["name", "Depeche Mode"], ["description", "Fast fashion"]]
+    @some_docs = [doc1, doc2]
   end
 
   after do
     @store.close
+  end
+
+  it "should require zero configuration" do
+    engine = Moonstone::Engine.new
+    engine.index(@some_docs)
+    engine.reader do |r|
+      r.terms.for_field('name').sort.should == %w{ burger king depeche mode }.sort
+    end  
   end
   
   it "initializes with an options hash" do
@@ -60,9 +63,7 @@ describe "A subclass of Moonstone::Engine" do
   end
   
   it "can index a collection of records" do
-    doc1 = [["name", "Burger King"], ["description", "Fast food"]]
-    doc2 = [["name", "Depeche Mode"], ["description", "Fast fashion"]]
-    @engine.index([doc1, doc2])
+    @engine.index(@some_docs)
     @engine.reader do |r|
       r.terms.for_field('name').sort.should == %w{ shakey pizza ikea burger king depeche mode }.sort
     end

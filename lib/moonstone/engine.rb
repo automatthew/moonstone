@@ -143,7 +143,13 @@ module Moonstone
     # Returns an instance of the Analyzer class defined within 
     # this class's namespace.
     def analyzer
-      @analyzer ||= self.class::Analyzer.new
+      @analyzer ||= (defined?(self.class::Analyzer) ? self.class::Analyzer.new : Lucene::Analysis::StandardAnalyzer.new )
+    end
+
+    # Analyze and index all fields.
+    # Override this method for custom behavior.
+    def doc_from(record)
+      Doc.create(record)
     end
     
     # Opens an IndexWriter for the duration of the block.
