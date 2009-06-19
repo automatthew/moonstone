@@ -14,10 +14,13 @@ Using moonstone is simple.
 
     engine = Moonstone::Engine.new
     # note: you can't use symbols for the keys
-    engine.index([{'title' => 'my blog post', 'content' => "blah blah blah"}])
-    q = Lucene::Search::TermQuery.new("title", "blog")
-    documents = engine.search(q)
+    engine.index([{'title' => 'first post', 'content' => "blah blah blah"}])
+		# this sets the field that is searched by default
+		engine.default_query_parser('title')
+    documents = engine.search('first')
     documents.each {|d| puts d['name']}
+		# to search on a different field
+		engine.search("content:blah")
 
 A typical engine will override two things; the doc_from method and the analyzer.
 
