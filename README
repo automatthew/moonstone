@@ -52,7 +52,7 @@ A typical engine will override two things; the doc_from method and the analyzer.
 
 == Lucene Transparency
 
-One of Moonstones core goals is to provide easy and transparet access to all of Lucene's classes and apis. This is accomplished through wrapper classes which, among other things, can be used to mimic typical Lucene usage in java.
+One of Moonstones core goals is to provide easy and transparent access to all of Lucene's classes and APIs. This is accomplished through wrapper classes which, among other things, can be used to mimic typical Lucene usage in Java.
 
 	store = Lucene::Store::RAMDirectory.new
 	analyzer = Lucene::Analysis::WhitespaceAnalyzer.new
