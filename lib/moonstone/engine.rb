@@ -2,7 +2,8 @@ module Moonstone
   class Engine
     include Lucene::Index
     include Lucene::Search
-    
+    include Lucene::Document
+
     attr_reader :store, :similarity
     
     # :store should be a String or some kind of Lucene::Store::Directory

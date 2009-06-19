@@ -10,7 +10,16 @@ Moonstone is a JRuby wrapper around Java's Lucene search engine toolkit.
 
 == Engines
 
-Creating an engine requires two things; a doc_from method and an analyzer.
+Using moonstone is simple.
+
+    engine = Moonstone::Engine.new
+    # note: you can't use symbols for the keys
+    engine.index([{'title' => 'my blog post', 'content' => "blah blah blah"}])
+    q = Lucene::Search::TermQuery.new("title", "blog")
+    documents = engine.search(q)
+    documents.each {|d| puts d['name']}
+
+A typical engine will override two things; the doc_from method and the analyzer.
 
 	class SimplestEngine < Moonstone::Engine
 	  def doc_from(record)
