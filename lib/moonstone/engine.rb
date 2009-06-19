@@ -141,8 +141,10 @@ module Moonstone
       @reader.close if @reader
     end
     
-    #def create_query(query_string)
-    #end
+    def create_query(query_string)
+      raise "no default queyr parser" unless @default_query_parser
+      @default_query_parser.parse(query_string)
+    end
 
     # Returns an instance of the Analyzer class defined within 
     # this class's namespace.
@@ -182,9 +184,8 @@ module Moonstone
       reader.close
     end
     
-    def parser(field, analyzer = nil)
-      @parser ||= {}
-      @parser[field.to_sym] ||= Lucene::QueryParser::Parser.new(field, analyzer || self.analyzer)
+    def default_query_parser(field, analyzer = nil)
+      @default_query_parser ||= Lucene::QueryParser::Parser.new(field, analyzer || self.analyzer)
     end
     
     def inspect_mode?
