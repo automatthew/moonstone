@@ -141,6 +141,9 @@ module Moonstone
       @reader.close if @reader
     end
     
+    #def create_query(query_string)
+    #end
+
     # Returns an instance of the Analyzer class defined within 
     # this class's namespace.
     def analyzer
@@ -178,7 +181,6 @@ module Moonstone
         yield reader
       reader.close
     end
-    
     
     def parser(field, analyzer = nil)
       @parser ||= {}

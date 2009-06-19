@@ -104,7 +104,7 @@ Moonstone also supplies base classes that make it easy to create such things as 
 	  end
 	end
 
-Moonstone also makes the common stuff easy. Many filters transform a single token into multiple tokens which requires the filter to maintain a queue of the tokens for subsequent calls to next(). In java this is usually achieved with copypasta. Moonstone provides a base class which handles this for you. Simply inherit from Moonstone::QueuedFilter and return an array of strings (or an individual string if no expansion is needed) and the tokenizing and queueing is handled by the base class.
+Moonstone also makes the common stuff easy. Many filters transform a single token into multiple tokens which requires the filter to maintain a queue of the tokens for subsequent calls to next(). Moonstone provides a base class which handles this for you. Simply inherit from Moonstone::QueuedFilter and return an array of strings (or an individual string if no expansion is needed) and the tokenizing and queueing is handled by the base class.
 
 	class MakePluralFilter < Moonstone::QueuedFilter
 	  def process(text)
