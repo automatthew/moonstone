@@ -112,8 +112,8 @@ describe "The low level Lucene wrapper (plus some sugar)" do
     IndexSearcher.open(@store) do |searcher|
       parser = Parser.new("contents", @analyzer)
       query = parser.parse("monkeys")
-      hits = searcher.search(query)
-      hits.size.should == 2
+      top_docs = searcher.search(query, 10)
+      top_docs.size.should == 2
     
       term = Term.new("contents", "frequently")
       hits = searcher.search(TermQuery.new(term))
@@ -122,7 +122,6 @@ describe "The low level Lucene wrapper (plus some sugar)" do
       docs.first.get("filename").should == "#{here}/tmp/docs/monkey_stink"
     end
   end
-  
 
   
 end

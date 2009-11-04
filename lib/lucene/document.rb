@@ -86,7 +86,7 @@ module Lucene
       end
       
       def analyzed(name, value)
-        add_field(name, value, :store => true, :index => :tokenized)
+        add_field(name, value, :store => true, :index => :analyzed)
       end
       
       def unanalyzed(name, value)

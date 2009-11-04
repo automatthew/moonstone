@@ -4,6 +4,10 @@ module Lucene
     
     [ SortField, Sort ]
     
+    Hit.module_eval do
+      alias_method :[], :get
+    end
+    
     Hits.module_eval do
       include Enumerable
       def each
@@ -14,10 +18,6 @@ module Lucene
         end
       end
       
-      def to_a
-        map
-      end
-      
       alias_method :size, :length
     end
     
@@ -25,76 +25,64 @@ module Lucene
       attr_accessor :query
       include Enumerable
             
-      def each(searcher=nil)
-        initialize_docs(searcher) if searcher && documents.empty? #Do we ever want to reinitialize the documents list?
-        documents.each { |doc| yield doc }
+      def each(&block)
+        scoreDocs.each(&block)
       end
       
-      def initialize_docs(searcher)
-        @offset ||= 0
-        self.scoreDocs.each_with_index do |sd, i|
-          #For pagination, only init the docs that fit the offset
-          if i >= @offset
-            doc = searcher.doc(sd.doc)
-            doc.score = sd.score
-            doc.id = sd.doc
-            documents << doc
-          end
+      def each_doc(searcher)
+        scoreDocs.each do |sd|
+          doc = searcher.doc(sd.doc)
+          doc.score = sd.score
+          doc.id = sd.doc
+          yield(doc)
         end
       end
       
-      #Remove docs that precede the offset
-      def offset!(offset)
-        @offset = offset || 0
-        self
+      def documents(searcher, &block)
+        docs = []
+        if block_given?
+          each_doc(searcher) { |d| yield(d); docs << d  }
+        else
+          each_doc(searcher) { |d| docs << d  }
+        end
+        docs
       end
-      
-      def offset
-        @offset ||= 0
-      end
-      
+            
       def [](index)
-        documents[index]
+        scoreDocs[index]
       end
       
       def first
-        documents[0]
+        scoreDocs[0]
       end
       
       def last
-        to_a.last
+        scoreDocs[scoreDocs.length - 1]
       end
       
       def length
-        self.scoreDocs.length - (@offset || 0)
+        scoreDocs.length - (@offset || 0)
       end
       
       alias_method :size, :length
       
       def empty?
-        self.length == 0
+        self.length <= 0
       end
       
       def to_hash
         {
           :query => self.query,
           :total_hits => self.totalHits,
-          :documents => self.to_a
+          :documents => self.documents
         }
       end
       
       def to_json
         to_hash.to_json
       end
+
       
-    private
-      def documents
-        @documents ||= []
-      end
-    end
-    
-    Hit.module_eval do
-      alias_method :[], :get
     end
     
     IndexSearcher.module_eval do
