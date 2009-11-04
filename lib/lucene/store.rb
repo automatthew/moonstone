@@ -2,7 +2,7 @@ module Lucene
   module Store
     include_package "org.apache.lucene.store"
     
-    # Biggie Smalls, Biggie Smalls, Biggie Smalls
+    # Mention classes so they can be referenced elsewhere
     [
       Directory,
       FSDirectory,

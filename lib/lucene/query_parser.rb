@@ -5,7 +5,7 @@ module Lucene
     # avoid problems with Lucene::QueryParser::QueryParser
     Parser = org.apache.lucene.queryParser.QueryParser
     
-    # Biggie Smalls, Biggie Smalls, Biggie Smalls
+    # Mention classes so they can be referenced elsewhere
     [
       MultiFieldQueryParser,
       Token

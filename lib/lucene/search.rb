@@ -101,7 +101,7 @@ module Lucene
     
 
     
-    # Biggie Smalls, Biggie Smalls, Biggie Smalls
+    # Mention classes so they can be referenced elsewhere
     [
       Explanation,
       Collector,
