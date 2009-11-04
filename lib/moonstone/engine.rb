@@ -119,16 +119,14 @@ module Moonstone
         hit_collector.topDocs
       else
         options[:limit] ||= 25
-        options[:offset] ||= 0
-        args = [ options[:filter], (options[:limit] + options[:offset]) ]  #Always include both of these, even if nil
+        args = [ options[:filter], options[:limit] ]
         args << options[:sort] if options[:sort]
-        @searcher.search(query, *args).offset!(options[:offset])
+        @searcher.search(query, *args)
       end
-      top_docs.each(@searcher) do |doc| 
+      top_docs.documents(@searcher) do |doc| 
         doc.tokens = self.tokens_for_doc(doc) if inspect_mode?
         yield doc if block_given?
       end
-      top_docs
     end
     
     #Reopen the searcher (used when the index has changed)

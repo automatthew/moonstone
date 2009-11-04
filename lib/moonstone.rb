@@ -11,6 +11,7 @@ require 'lucene/function'
 require 'lucene/index'
 require 'lucene/query_parser'
 require 'lucene/search'
+require 'lucene/search/top_docs'
 require 'lucene/store'
 
 require 'moonstone/engine'

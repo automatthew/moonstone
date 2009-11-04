@@ -81,6 +81,7 @@ describe "A subclass of Moonstone::Engine" do
   end
   
   it "can search with an offset" do
+    pending("completely revamped concepts of pagination")
     all = @engine.search("Pizza Hut")
     all.size.should == 2
     results = @engine.search("Pizza Hut", :limit => 1, :offset => 1)
@@ -94,6 +95,7 @@ describe "A subclass of Moonstone::Engine" do
   end
   
   it "contains the total hits count" do
+    pending("TopDocs rework for DocumentIterator")
     results = @engine.search("Pizza Hut", :limit => 1)
     results.size.should == 1
     results.totalHits.should == 2
