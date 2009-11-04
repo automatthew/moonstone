@@ -6,7 +6,7 @@ module Lucene
       MaxFieldLength = self::MaxFieldLength
       
       def self.open(*args)
-        args << MaxFieldLength::UNLIMITED unless args.last.is_a? MaxFieldLength
+        args << MaxFieldLength::UNLIMITED unless args.include? MaxFieldLength
         writer = new(*args)
         begin
           result = yield(writer)
