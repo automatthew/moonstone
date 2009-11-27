@@ -163,7 +163,7 @@ module Moonstone
     # Opens an IndexWriter for the duration of the block.
     #   engine.writer { |w| w.add_document(doc) }
     def writer
-      IndexWriter.open(@store, self.class::Analyzer.new) do |writer|
+      IndexWriter.open(@store, analyzer) do |writer|
         writer.set_similarity(@similarity.new) if @similarity
         yield writer
       end
