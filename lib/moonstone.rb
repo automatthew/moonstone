@@ -12,6 +12,7 @@ require 'lucene/index'
 require 'lucene/query_parser'
 require 'lucene/search'
 require 'lucene/search/top_docs'
+require 'lucene/search/queries'
 require 'lucene/store'
 
 require 'moonstone/engine'
@@ -24,6 +25,6 @@ require 'moonstone/index_inspection'
 
 require 'moonstone/filters/synonymer.rb'
 
-require 'moonstone/racker'
+# require 'moonstone/racker'
 
 Moonstone::Logger = Logger.new($stderr) unless defined? Moonstone::Logger
