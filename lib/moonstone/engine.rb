@@ -106,6 +106,13 @@ module Moonstone
       delete_documents([term])
     end
     
+    def optimize
+      IndexWriter.open(@store, analyzer) do |writer|
+        writer.optimize
+      end
+      refresh_searcher
+    end
+    
     # Takes any kind of input object parsable by your #create_query method.  Quack.  
     # Options patterns (see javadoc for org.apache.lucene.search.Searcher):
     # Returns a TopDocs object
