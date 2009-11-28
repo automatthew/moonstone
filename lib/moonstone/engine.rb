@@ -145,7 +145,9 @@ module Moonstone
     
     def close
       @searcher.close if @searcher
+      @searcher = nil
       @reader.close if @reader
+      @reader = nil
     end
     
     # Returns an instance of the Analyzer class defined within 
