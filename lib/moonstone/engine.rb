@@ -142,7 +142,7 @@ module Moonstone
     end
     
     def create_query(query_string)
-      raise "no default queyr parser" unless @default_query_parser
+      raise "no default query parser" unless @default_query_parser
       @default_query_parser.parse(query_string)
     end
 
