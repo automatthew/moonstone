@@ -27,7 +27,7 @@ spec = Gem::Specification.new { |s|
   s.name = 'moonstone'
   s.summary = "Moonstone Agile Search Framework"
   deps.each &s.method(:add_dependency)
-  s.version = '0.6.0'
+  s.version = '0.6.1'
 }
 
 Rake::GemPackageTask.new(spec) { |pkg|
