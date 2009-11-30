@@ -5,8 +5,8 @@ Moonstone is a JRuby wrapper around Java's Lucene search engine toolkit.
 == Goals
 
 * Engines: An engine abstraction that brings all common index and search operations under a single roof.
-* Lucene Transparency: a transparent JRuby wrapper around Lucene
-* Rubify Lucene: higher level classes that simplify use of Lucene constructs in Ruby
+* Lucene Transparency: A transparent JRuby wrapper around Lucene which allows clear and direct access to the underlying lucene classes.
+* Rubify Lucene: Higher level classes that simplify and Rubify the use of Lucene.
 
 == Engines
 
@@ -14,10 +14,13 @@ Using moonstone is simple.
 
     engine = Moonstone::Engine.new
     # note: you can't use symbols for the keys
-    engine.index([{'title' => 'my blog post', 'content' => "blah blah blah"}])
-    q = Lucene::Search::TermQuery.new("title", "blog")
-    documents = engine.search(q)
-    documents.each {|d| puts d['name']}
+    engine.index([{'title' => 'first post', 'content' => "blah blah blah"}])
+		# this sets the field that is searched by default
+		engine.default_query_parser('title')
+    documents = engine.search('first')
+    documents.each {|d| puts d['title']}
+		# to search on a different field
+		engine.search("content:blah")
 
 A typical engine will override two things; the doc_from method and the analyzer.
 

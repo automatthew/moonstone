@@ -46,7 +46,12 @@ describe "A subclass of Moonstone::Engine" do
     engine.index(@some_docs)
     engine.reader do |r|
       r.terms.for_field('name').sort.should == %w{ burger king depeche mode }.sort
-    end  
+    end
+
+    engine.default_query_parser("name")
+    results = engine.search("burger")
+    results[0]["name"].should == "Burger King"
+    results.length.should == 1
   end
   
   it "initializes with an options hash" do
