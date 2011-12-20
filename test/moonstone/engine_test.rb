@@ -20,14 +20,14 @@ describe "A subclass of Moonstone::Engine" do
     IndexWriter.open(@store, @analyzer, true) do |writer|
       writer.add_documents(docs)
     end
-    
+
     @class = Class.new(Moonstone::Engine) do
       def create_query(string)
         token = string.split(" ").first.downcase
         TermQuery.new(Term.new("description", token))
       end
     end
-    
+
     @engine = @class.new(:store => @store, :inspect => true)
     @results = @engine.search("Pizza Hut")
     @result = @results.first
@@ -53,38 +53,38 @@ describe "A subclass of Moonstone::Engine" do
     results[0]["name"].should == "Burger King"
     results.length.should == 1
   end
-  
+
   it "initializes with an options hash" do
     engine = @class.new
     engine.store.class.should == RAMDirectory
-    
+
     engine = @class.new(:store => "path/to/directory")
     engine.store.should == "path/to/directory"
-    
+
     store = RAMDirectory.new
     engine = @class.new(:store => store)
     engine.store.class.should == RAMDirectory
 
   end
-  
+
   it "can index a collection of records" do
     @engine.index(@some_docs)
     @engine.reader do |r|
       r.terms.for_field('name').sort.should == %w{ shakey pizza ikea burger king depeche mode }.sort
     end
   end
-  
+
   it "can do a basic search" do
     results = @engine.search("Pizza Hut")
     results.should.respond_to? :each
     results.size.should == 2
   end
-  
+
   it "can search with a limit" do
     results = @engine.search("Pizza Hut", :limit => 1)
     results.size.should == 1
   end
-  
+
   it "can search with an offset" do
     all = @engine.search("Pizza Hut")
     all.size.should == 2
@@ -92,18 +92,18 @@ describe "A subclass of Moonstone::Engine" do
     results.size.should == 1
     results[0].id.should == all[1].id
   end
-  
+
   it "search returns an Enumerable results set" do
     @results.class.included_modules.should include Enumerable
     @results.should.respond_to? :each
   end
-  
+
   it "contains the total hits count" do
     results = @engine.search("Pizza Hut", :limit => 1)
     results.size.should == 1
     results.totalHits.should == 2
   end
-  
+
   it "search takes a block" do
     r = []
     @engine.search("Pizza Hut") do |doc|
@@ -111,30 +111,30 @@ describe "A subclass of Moonstone::Engine" do
     end
     r.sort.should == ["Ikea", "Shakey's Pizza"].sort
   end
-  
+
   it "should populate a tokens hash in the doc (with inspect == true)" do
     @result.tokens.nil?.should be_false
     ["shakey", "pizza"].each { |token| @result.tokens['name'].include?(token).should == true }
     ["pizza", "video", "game"].each { |token| @result.tokens['description'].include?(token).should == true }
   end
-  
+
   describe "an individual result" do
-    
+
     it "is a Document" do
       @result.class.should == Document
     end
-    
+
     it "provides the document score" do
       @result.score.class.should == Float
     end
-    
+
   end
 
   it "can search with a filter and limit"
   it "can search with a filter, limit and sort"
-  
+
   describe "incremental updates" do
-    
+
     before do
       #Add some docs to play with
       docs = [
@@ -145,7 +145,7 @@ describe "A subclass of Moonstone::Engine" do
       @engine.insert_documents(docs)
       @engine.search("generic").length.should == 3
     end
-    
+
     after do
       docs = [
           {:field => "id", :value => "1234"},
@@ -155,7 +155,7 @@ describe "A subclass of Moonstone::Engine" do
       @engine.delete_documents(docs)
       @engine.search("generic").length.should == 0
     end
-    
+
     it "can update an existing record" do
       doc = [
               ["id", "1234"],
@@ -169,7 +169,7 @@ describe "A subclass of Moonstone::Engine" do
       result['name'].should == "pizza place"
       result['description'].should == "the first generic pizza place - 1234"
     end
-    
+
     it "can update multiple records at the same time" do
       documents = [
                     {
@@ -207,7 +207,7 @@ describe "A subclass of Moonstone::Engine" do
         result["description"].include?("#{result['id']}-a").should == true
       end
     end
-    
+
     it "can add and delete a record" do
       doc = [["id", "4567"], ["name", "Temp Pizza Place"], ["description", "This is just a doc to be deleted"]]
       @engine.insert_document(doc)
@@ -215,7 +215,7 @@ describe "A subclass of Moonstone::Engine" do
       @engine.delete_document(:field => "id", :value => "4567")
       @engine.search("deleted").length.should == 0
     end
-    
+
   end
-  
+
 end

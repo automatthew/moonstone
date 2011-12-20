@@ -1,12 +1,12 @@
 module Moonstone
   class Tokenizer < Lucene::Analysis::Tokenizer
-   
+
     include Lucene::Analysis
-    
+
     def initialize(reader)
       @reader = java.io.BufferedReader.new(reader)
     end
-    
+
     # No, this is not terribly useful.  Subclass me already.
     def next(token=nil)
       token = (token ? token.clear :  Token.new)
@@ -14,6 +14,6 @@ module Moonstone
       token.set_start_offset 1
       token.set_end_offset 1
     end
-   
+
   end
 end

@@ -1,16 +1,16 @@
 module Lucene
   module Document
     include_package "org.apache.lucene.document"
-    
+
     # avoid naming problems with Lucene::Document::Document
     Doc = Lucene::Document::Document
-    
+
     # I spit on final class
     Doc.module_eval do
       attr_accessor :score, :id, :tokens, :explanation
-      
+
       self::Field = Lucene::Document::Field
-      
+
       @@field_store = {
         nil => Field::Store::YES,
         false => Field::Store::NO,
@@ -37,7 +37,7 @@ module Lucene
         :not_analyzed_no_norms => Field::Index::NOT_ANALYZED_NO_NORMS,
         :NOT_ANALYZED_NO_NORMS => Field::Index::NOT_ANALYZED_NO_NORMS
       }
-      
+
       @@field_term_vector = {
         nil => Field::TermVector::NO,
         :NO => Field::TermVector::NO,
@@ -53,19 +53,19 @@ module Lucene
         :WITH_POSITIONS_OFFSETS => Field::TermVector::WITH_POSITIONS_OFFSETS,
         :with_positions_offsets => Field::TermVector::WITH_POSITIONS_OFFSETS
       }
-      
+
       def self.new
         doc = super()
         yield doc if block_given?
         doc
       end
-      
+
       def self.create(fields)
         doc = self.new
         fields.each { |field| doc.add_field(*field) }
         doc
       end
-      
+
       def add_field(name, value, options={})
         field = if value.is_a? java.io.Reader
           Field.new(name, value, @@field_term_vector[options[:term_vector]])
@@ -79,32 +79,32 @@ module Lucene
         end
         add(field)
       end
-      
+
       # specialty field adders
       def stored(name, value)
         add_field(name, value, :store => true, :index => false)
       end
-      
+
       def analyzed(name, value)
         add_field(name, value, :store => true, :index => :tokenized)
       end
-      
+
       def unanalyzed(name, value)
         add_field(name, value, :store => true, :index => :not_analyzed)
       end
-      
+
       alias_method :[], :get
-      
+
       def get_all(field_name)
         fields.select { |f| f.name == field_name }.map { |f| f.string_value }
       end
-      
+
       def field_names
         fields.map { |f| f.name }.uniq
       end
-      
+
       alias_method :keys, :field_names
-      
+
       def to_hash
         hash = {}
         hash["id"] = @id if @id
@@ -120,26 +120,26 @@ module Lucene
         hash["tokens"] = @tokens if @tokens
         hash
       end
-      
+
       def to_json
         to_hash.to_json
       end
-              
+
     end
-    
+
     Field.module_eval do
-      
+
       alias_method :stored?, :is_stored
       alias_method :indexed?, :is_indexed
       alias_method :tokenized?, :is_tokenized
       alias_method :analyzed?, :is_tokenized
       alias_method :compressed?, :is_compressed
-      
+
       def unanalyzed?; indexed? && !analyzed?; end
       def unindexed?; stored? && !indexed?; end
-      
+
     end
-  
+
     # Biggie Smalls, Biggie Smalls, Biggie Smalls
     [
       DateField,

@@ -5,18 +5,18 @@ module Moonstone
     include Lucene::Document
 
     attr_reader :store, :similarity
-    
+
     # :store should be a String or some kind of Lucene::Store::Directory
     def initialize(options = {})
       @store = options[:store] || Lucene::Store::RAMDirectory.new
       @inspect = options[:inspect]
     end
-    
+
     # The source should be enumerable.
     def index(source, optimize=true)
       IndexWriter.open(@store, analyzer) do |writer|
         writer.set_similarity(@similarity.new) if @similarity
-        
+
         source.each_with_index do |record, i|
           doc = doc_from(record)
           writer.add_document(doc) if doc
@@ -27,7 +27,7 @@ module Moonstone
       end
       refresh_searcher
     end
-    
+
     def stamp_metadata
       metadata = Lucene::Document::Doc.new
       metadata.add_field 'metadata', 'index', :index => :not_analyzed
@@ -39,39 +39,39 @@ module Moonstone
         w.add_document(metadata)
       end
     end
-    
+
     def index_metadata
       query = TermQuery.new 'metadata', 'index'
       @index_metadata ||= search(query).last
     end
-    
+
     def doc_count
       @reader ||= IndexReader.open(@store)
       @reader.max_doc
     end
-    
+
     def document(id)
       @reader ||= IndexReader.open(@store)
       if id < @reader.max_doc
-        doc = @reader.document(id) 
+        doc = @reader.document(id)
         doc.tokens = tokens_for_doc(id)
         doc.id = id
         doc
       end
     end
-    
+
     # Adds docs to index.  docs must be an enumerable set of such objects that doc_from can turn into a document
     def insert_documents(source, optimize=false)
       index(source, optimize)
       refresh_searcher
     end
-    
+
     def insert_document(source, optimize=false)
       insert_documents([source], optimize)
     end
-    
+
     # docs must be enumerable set of hashes, with fields
-    # :field, :value, :document 
+    # :field, :value, :document
     # (where field and value combine to make a term to match documents to replace)
     def update_documents(docs)
       IndexWriter.open(@store, analyzer) do |writer|
@@ -85,11 +85,11 @@ module Moonstone
       end
       refresh_searcher
     end
-    
+
     def update_document(doc)
       update_documents([doc])
     end
-    
+
     # terms should be an enumerable set of hashes, with fields
     # :field and :value, which combine to make a term to match documents to delete
     def delete_documents(terms)
@@ -101,19 +101,19 @@ module Moonstone
       end
       refresh_searcher
     end
-    
+
     def delete_document(term)
       delete_documents([term])
     end
-    
+
     def optimize
       IndexWriter.open(@store, analyzer) do |writer|
         writer.optimize
       end
       refresh_searcher
     end
-    
-    # Takes any kind of input object parsable by your #create_query method.  Quack.  
+
+    # Takes any kind of input object parsable by your #create_query method.  Quack.
     # Options patterns (see javadoc for org.apache.lucene.search.Searcher):
     # Returns a TopDocs object
     # Note that Hits is deprecated so the versions of search() returning a Hits object are not implemented
@@ -131,31 +131,31 @@ module Moonstone
         args << options[:sort] if options[:sort]
         @searcher.search(query, *args).offset!(options[:offset])
       end
-      top_docs.each(@searcher) do |doc| 
+      top_docs.each(@searcher) do |doc|
         doc.tokens = self.tokens_for_doc(doc) if inspect_mode?
         yield doc if block_given?
       end
       top_docs
     end
-    
+
     #Reopen the searcher (used when the index has changed)
     def refresh_searcher
       @searcher = IndexSearcher.new(@store) if @searcher  #If it's nil, it'll get lazy loaded
     end
-    
+
     def close
       @searcher.close if @searcher
       @searcher = nil
       @reader.close if @reader
       @reader = nil
     end
-    
+
     def create_query(query_string)
       raise "no default query parser" unless @default_query_parser
       @default_query_parser.parse(query_string)
     end
 
-    # Returns an instance of the Analyzer class defined within 
+    # Returns an instance of the Analyzer class defined within
     # this class's namespace.
     def analyzer
       @analyzer ||= (defined?(self.class::Analyzer) ? self.class::Analyzer.new : Lucene::Analysis::StandardAnalyzer.new )
@@ -166,7 +166,7 @@ module Moonstone
     def doc_from(record)
       Doc.create(record)
     end
-    
+
     # Opens an IndexWriter for the duration of the block.
     #   engine.writer { |w| w.add_document(doc) }
     def writer
@@ -192,14 +192,14 @@ module Moonstone
         yield reader
       reader.close
     end
-    
+
     def default_query_parser(field, analyzer = nil)
       @default_query_parser ||= Lucene::QueryParser::Parser.new(field, analyzer || self.analyzer)
     end
-    
+
     def inspect_mode?
       @inspect
     end
-        
+
   end
 end

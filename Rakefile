@@ -57,5 +57,5 @@ task :test do
   options = ENV['options']
   files = FileList['test/**/*.rb'].exclude('test/helpers.rb')
   puts cmd = "jruby #{options} -I lib -S spec -c #{  files.join(' ') }"
-  system cmd 
+  system cmd
 end

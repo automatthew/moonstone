@@ -1,9 +1,9 @@
 module Moonstone
-    
+
   module Filters
-    
+
     class Synonymer < Moonstone::QueuedFilter
-      
+
       def initialize(stream, synonym_hash)
         @synonym_hash = synonym_hash
         super(stream)
@@ -20,7 +20,7 @@ module Moonstone
           text
         end
       end
-      
+
     end
   end
 end
