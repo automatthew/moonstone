@@ -3,7 +3,7 @@ module Moonstone
   module Racker
     module LocalSearch
       include Moonstone::Racker
-    
+
       def json_GET_search(request)
         args = request.params.values_at('topic', 'lat', 'lon')
         options = search_options(request)
@@ -13,7 +13,7 @@ module Moonstone
         results[:time] = Time.now - t
         results.to_json
       end
-    
+
       # JSON body should contain an array of 3-element arrays (topic, lat, lon)
       #  curl -i -X POST -d '[ ["plumbers", "", ""], ["burgers", "", ""] ]' \
       #    http://localhost:9292/search.json
@@ -27,7 +27,7 @@ module Moonstone
           results
         end.to_json
       end
-    
+
     end
   end
 end

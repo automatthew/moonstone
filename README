@@ -35,7 +35,7 @@ A typical engine will override two things; the doc_from method and the analyzer.
 	  def analyzer
 	    @analyzer ||= Lucene::Analysis::WhitespaceAnalyzer.new
 	  end
-	end 
+	end
 
 	# We can now instantiate the engine
 	engine = SimplestEngine.new
@@ -45,7 +45,7 @@ A typical engine will override two things; the doc_from method and the analyzer.
 	    {:name => "Moonstone", :description => "A simple JRuby wrapper around Lucene"},
 	    {:name => "Foo", :description => "A search engine based on Moonstone"}
 	  ]
-	# By convention the index method accepts an Enumerable that yields hashes 
+	# By convention the index method accepts an Enumerable that yields hashes
 	engine.index(records)
 
 	#Search for data
@@ -87,7 +87,7 @@ Moonstone gently augments these wrapper classes with some common Ruby idioms and
 	  doc1.add_field("category", "pseudo-Italian food", :term_vector => :with_positions)
 	  doc1.add_field("zip", "78660", :index => false)
 	  #or create a doc and add fields by pattern in the constructor
-	  doc2 = Doc.create [ ["name", "Olive Garden"], 
+	  doc2 = Doc.create [ ["name", "Olive Garden"],
 	                      ["category", "pseudo-Italian food", { :term_vector => :with_positions }],
 	                      ["zip", "78660", { :index => false }] ]
 	  writer.add_documents([doc1, doc2])
@@ -114,4 +114,4 @@ Moonstone also makes the common stuff easy. Many filters transform a single toke
 	    # we can return an array of strings or an individual string
 	    [text, text + 's']
 	  end
-	end 
+	end

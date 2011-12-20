@@ -3,7 +3,7 @@ module Moonstone
   module Racker
     module BasicSearch
       include Moonstone::Racker
-      
+
       # GET /search.html?input=happiness
       def html_GET_search(request)
         results = search(request.params['input'], search_options(request))
@@ -22,7 +22,7 @@ module Moonstone
         data = request.env['rack.input'].read
         JSON.parse(data).map { |input| search(input, options) }.to_json
       end
-      
+
     end
   end
 end

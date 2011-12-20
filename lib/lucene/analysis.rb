@@ -1,7 +1,7 @@
 module Lucene
   module Analysis
     include_package "org.apache.lucene.analysis"
-    
+
     module Standard
       include_package "org.apache.lucene.analysis.standard"
       [
@@ -11,7 +11,7 @@ module Lucene
       ]
     end
     include Standard
-    
+
     TokenStream.module_eval do
       include Enumerable
       def each
@@ -21,15 +21,15 @@ module Lucene
         end
       end
     end
-    
+
     Analyzer.module_eval do
       def tokenize(field, text)
         token_stream(field, java.io.StringReader.new(text)).map { |token| token.term_text }
       end
     end
-    
+
     # Biggie Smalls, Biggie Smalls, Biggie Smalls
-    [ 
+    [
       CachingTokenFilter,
       CharTokenizer,
       ISOLatin1AccentFilter,

@@ -8,7 +8,7 @@ module Moonstone
       analyzer.filter_chain = classes
       analyzer
     end
-    
+
     def tokenStream(field_name, reader)
       tokenizer, *args = @filter_chain[0]
       stream = tokenizer.new(reader, *args)
@@ -18,6 +18,6 @@ module Moonstone
       end
       stream
     end
-    
+
   end
 end

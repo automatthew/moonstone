@@ -1,12 +1,12 @@
 module Moonstone
-  
+
   class QueuedFilter < Moonstone::Filter
-    
+
     def initialize(stream)
       @buffer = []
       super
     end
-    
+
     def read_buffer(token=nil)
       if item = @buffer.shift
         if item.is_a? String
@@ -18,7 +18,7 @@ module Moonstone
         end
       end
     end
-    
+
     def next(token=nil)
       if t = read_buffer(token)
         t
@@ -39,7 +39,7 @@ module Moonstone
         end
       end
     end
-    
+
   end
-  
+
 end

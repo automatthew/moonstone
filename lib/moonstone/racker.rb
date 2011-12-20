@@ -3,9 +3,9 @@ require 'json'
 module Moonstone
   # include me in a Moonstone::Engine, maybe?
   module Racker
-    
+
     PathMatcher = %r{^/([\w_]+)\.([\w_]+)$}
-    
+
     def call(env)
       request, response = Rack::Request.new(env), Rack::Response.new
       # Determine (or possibly fake) an HTTP method
@@ -32,7 +32,7 @@ module Moonstone
       end
       response.finish
     end
-    
+
     # helper for action methods
     def search_options(request)
       params = request.params
@@ -43,28 +43,28 @@ module Moonstone
       options[:offset] = offset.to_i if offset
       options
     end
-    
+
     def json_GET_engine_version(request)
-      { :name => self.class.name, 
+      { :name => self.class.name,
         :version => `git show-ref -h -s --abbrev HEAD`.chomp.split.first
       }.to_json
     end
-    
+
     def json_GET_index_info(request)
       md = index_metadata || {}
       {   :build_date => md["build_date"],
-          :build_engine => {  :name => md["engine_name"], 
+          :build_engine => {  :name => md["engine_name"],
                               :version => md["engine_version"]},
           :query_conditions => md["query_conditions"],
           :doc_count => doc_count
       }.to_json
     end
-    
+
     def json_GET_document(request)
       document(request.params['id'].to_i).to_json
     end
-    
-    def self.generate_rackup_file(engine, store)      
+
+    def self.generate_rackup_file(engine, store)
       rackup = <<RACKUP
 options[:Port] = 9293
 #{yield}
@@ -79,6 +79,6 @@ RACKUP
         f.puts rackup
       end
     end
-    
+
   end
 end

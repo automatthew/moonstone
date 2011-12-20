@@ -1,7 +1,7 @@
 module Moonstone
   module Racker
     module LocalClient
-      
+
       def search(topic, location, options={})
         raise "Unable to use supplied location: #{location}" unless loc = geo(location)
         query = {:input => topic, :lat => loc['latitude'].to_s, :lon => loc['longitude'].to_s}
@@ -13,12 +13,12 @@ module Moonstone
       rescue Errno::ECONNREFUSED
         {}
       end
-      
+
       def geo(location)
-        lat = location['lat'] || location['latitude'] || location['LAT'] || 
+        lat = location['lat'] || location['latitude'] || location['LAT'] ||
           location[:lat] || location[:latitude]
         lon = location['lon'] || location['long'] || location['LON'] ||
-          location['longitude'] || location[:lon] || 
+          location['longitude'] || location[:lon] ||
           location[:long] || location[:longitude]
         {'latitude' => lat, "longitude" => lon} if lat && lon
       end

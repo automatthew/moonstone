@@ -9,12 +9,12 @@ include Lucene::Store
 include Lucene::Document
 
 describe "Moonstone::QueuedFilter" do
-  
+
   before do
     @filter_class = Class.new(Moonstone::QueuedFilter)
     @input = WhitespaceTokenizer.new(java.io.StringReader.new("three blind mice"))
   end
-  
+
   it "may simply define #process(token)" do
     test_filter = Class.new(@filter_class) do
       def process(text)
