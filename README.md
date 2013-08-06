@@ -12,6 +12,7 @@ Moonstone is a JRuby wrapper around Java's Lucene search engine toolkit.
 
 Using moonstone is simple.
 
+```ruby
     engine = Moonstone::Engine.new
     # note: you can't use symbols for the keys
     engine.index([{'title' => 'first post', 'content' => "blah blah blah"}])
@@ -21,9 +22,11 @@ Using moonstone is simple.
     documents.each {|d| puts d['title']}
 		# to search on a different field
 		engine.search("content:blah")
+```
 
 A typical engine will override two things; the doc_from method and the analyzer.
 
+```ruby
 	class SimplestEngine < Moonstone::Engine
 	  def doc_from(record)
 	    doc = Lucene::Document::Doc.new
@@ -52,11 +55,13 @@ A typical engine will override two things; the doc_from method and the analyzer.
 	q = Lucene::Search::TermQuery.new("name", "Moonstone")
 	documents = engine.search(q)
 	documents.each {|d| puts d['name']}
+```
 
 == Lucene Transparency
 
 One of Moonstones core goals is to provide easy and transparent access to all of Lucene's classes and APIs. This is accomplished through wrapper classes which, among other things, can be used to mimic typical Lucene usage in Java.
 
+```ruby
 	store = Lucene::Store::RAMDirectory.new
 	analyzer = Lucene::Analysis::WhitespaceAnalyzer.new
 	writer = Lucene::Index::IndexWriter.new(store, analyzer)
@@ -67,11 +72,13 @@ One of Moonstones core goals is to provide easy and transparent access to all of
 	document.add(field)
 	writer.add_document(document)
 	writer.close
+```
 
 == Rubify Lucene
 
 Moonstone gently augments these wrapper classes with some common Ruby idioms and niceties, making enumerable things Enumerable, using the IO#open pattern with objects that need closing, and supporting the inclusion of namespaces.  Where possible, Moonstone adds helper methods that improve the signal-to-noise ratio.
 
+```ruby
 	include Lucene::Store
 	include Lucene::Index
 	include Lucene::Analysis
@@ -98,20 +105,25 @@ Moonstone gently augments these wrapper classes with some common Ruby idioms and
 	  top_docs = searcher.search(query, 10)
 	  top_docs.each(searcher) { |doc| puts doc["name"] }
 	end
+```
 
 Moonstone also supplies base classes that make it easy to create such things as TokenFilters in Ruby:
 
+```ruby
 	class StemFilter < Moonstone::Filter
 	  def process(text)
 	    # ... Code to stem tokens would go here ...
 	  end
 	end
+```
 
 Moonstone also makes the common stuff easy. Many filters transform a single token into multiple tokens which requires the filter to maintain a queue of the tokens for subsequent calls to next(). Moonstone provides a base class which handles this for you. Simply inherit from Moonstone::QueuedFilter and return an array of strings (or an individual string if no expansion is needed) and the tokenizing and queueing is handled by the base class.
 
+```ruby
 	class MakePluralFilter < Moonstone::QueuedFilter
 	  def process(text)
 	    # we can return an array of strings or an individual string
 	    [text, text + 's']
 	  end
-	end 
+	end
+```	
