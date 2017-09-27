@@ -51,7 +51,7 @@ records = [
 # By convention the index method accepts an Enumerable that yields hashes 
 engine.index(records)
 
-#Search for data
+# Search for data
 q = Lucene::Search::TermQuery.new("name", "Moonstone")
 documents = engine.search(q)
 documents.each {|d| puts d['name']}
